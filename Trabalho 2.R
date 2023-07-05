@@ -1,6 +1,6 @@
 setwd("~/Estudos/Séries temporais/Listas/Trabalho 2")
 #install.packages("pacman")
-pacman::p_load(Mcomp, tseries, tidyverse, forecast)
+pacman::p_load(Mcomp, tseries, tidyverse, forecast, xtable)
 data(M3)
 id=1893 # id da série 1893 1931
 
@@ -176,7 +176,7 @@ BIC <- rbind(fit1$bic,fit2$bic,fit3$bic,fit4$bic,
 Modelo <- cbind(c("ETS(A,A,A)","ETS(A,Ad,A)","ETS(M,A,A)","ETS(M,Ad,A)",
                   "ETS(M,A,M)","ETS(M,Ad,M)","ETS(M,M,M)","ETS(M,Md,M)"))
 d <- data.frame(Modelo,AIC,AICc,BIC)
-plot(fit11)
+plot(fit11) 
 
 #Resíduos
 par(mfrow=c(1,3))
@@ -262,13 +262,6 @@ f_ets_boxcox <- function(y, h){
   forecast(fit, h)
 }
 
-# forecastfunction = function(y, h, ...){
-#   fit = Arima(y, ...)
-#   forecast(fit, h)
-# }
-
-
-
 
 # Tamanho da série
 n <- length(serie)
@@ -286,16 +279,15 @@ MAE_arima_boxcox = CV_arima_boxcox %>% abs() %>% colMeans(na.rm=T)
 MAE_ets = CV_ets %>% abs() %>% colMeans(na.rm=T)
 MAE_ets_boxcox = CV_ets_boxcox %>% abs() %>% colMeans(na.rm=T)
 tab = cbind(as.numeric(MAE_arima), as.numeric(MAE_ets),as.numeric(MAE_arima_boxcox), as.numeric(MAE_ets_boxcox))
-colnames(tabela_erros) <- c('ARIMA', 'ETS',
-                            'ARIMA com Box-Cox', 'ETS com Box-Cox')
-knitr::kable(tabela_erros)
+colnames(tab) <- c('ARIMA', 'ETS', 'ARIMA com Box-Cox', 'ETS com Box-Cox')
+xtable(tab)
 
 # Gráfico das médias dos resultados dos erros
 # Sem transformação <- as.numeric(tab)
-plot.ts(tab,plot.type='s',col=1:4,lwd=2,xlab="h",ylab="MAE",
+plot.ts(tab,plot.type='s',col=c("#06d6a0","#1b9aaa","#ef476f","#ffc43d"),lwd=2,xlab="h",ylab="MAE",
         main=bquote('Gráfico dos horizontes e seus erros de previsão'))
 legend('topleft', legend=c('ARIMA', 'ETS','ARIMA com Box-Cox', 'ETS com Box-Cox'), 
-       col=1:4, lwd=2)
+       col=c("#06d6a0","#1b9aaa","#ef476f","#ffc43d"), lwd=2)
 
 
 
