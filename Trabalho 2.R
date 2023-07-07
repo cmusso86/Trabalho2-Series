@@ -72,7 +72,7 @@ Box.test(E, lag=20, type = "Ljung-Box")
 shapiro.test(E) 
 
 # Seleção modelo BOXCOX----
-lambda_auto <- serie %>% BoxCox.lambda()
+(lambda_auto <- serie %>% BoxCox.lambda())
 
 par(mfrow=c(2,1))
 serie %>% plot(main="Série original")
@@ -149,21 +149,21 @@ shapiro.test(E)
 # Seleção modelo ETS Normal ----
 mstl(serie) %>% plot()
 # Resultado de critério de informação ETS sem transformação
-fit1<- ets(serie,model = "AAA")
+fit1<- ets(serie,model = "AAA",damped = FALSE)
 fit2<- ets(serie,model = "AAA",damped = TRUE)
-fit3<- ets(serie,model = "MAA")
+fit3<- ets(serie,model = "MAA",damped = FALSE)
 fit4<- ets(serie,model = "MAA",damped = TRUE)
-#fit5<- ets(serie,model = "AMA")
+#fit5<- ets(serie,model = "AMA",damped = FALSE)
 #fit6<- ets(serie,model = "AMA",damped = TRUE)
-#fit7<- ets(serie,model = "AAM")
+#fit7<- ets(serie,model = "AAM",damped = FALSE)
 #fit8<- ets(serie,model = "AAM",damped = TRUE)
-#fit9<- ets(serie,model = "MMA")
+#fit9<- ets(serie,model = "MMA",damped = FALSE)
 #fit10<- ets(serie,model = "MMA",damped = TRUE)
-fit11<- ets(serie,model = "MAM")
+fit11<- ets(serie,model = "MAM",damped = FALSE)
 fit12<- ets(serie,model = "MAM",damped = TRUE)
-#fit13<- ets(serie,model = "AMM")
+#fit13<- ets(serie,model = "AMM",damped = FALSE)
 #fit14<- ets(serie,model = "AMM",damped = TRUE)
-fit15<- ets(serie,model = "MMM")
+fit15<- ets(serie,model = "MMM",damped = FALSE)
 fit16<- ets(serie,model = "MMM", damped = TRUE)
 
 AIC <- rbind(fit1$aic,fit2$aic,fit3$aic,fit4$aic,
@@ -176,11 +176,12 @@ BIC <- rbind(fit1$bic,fit2$bic,fit3$bic,fit4$bic,
 Modelo <- cbind(c("ETS(A,A,A)","ETS(A,Ad,A)","ETS(M,A,A)","ETS(M,Ad,A)",
                   "ETS(M,A,M)","ETS(M,Ad,M)","ETS(M,M,M)","ETS(M,Md,M)"))
 d <- data.frame(Modelo,AIC,AICc,BIC)
-plot(fit11) 
+xtable(d)
+plot(fit16) 
 
 #Resíduos
 par(mfrow=c(1,3))
-E <- fit11$residuals
+E <- fit16$residuals
 plot(E)
 qqnorm(E) 
 qqline(E)
@@ -196,21 +197,21 @@ shapiro.test(E)
 # Seleção modelo ETS boxcox ----
 mstl(serie_box) %>% plot()
 # Resultado de critério de informação ETS sem transformação
-fit1_box<- ets(serie_box,model = "AAA")
+fit1_box<- ets(serie_box,model = "AAA",damped = FALSE)
 fit2_box<- ets(serie_box,model = "AAA",damped = TRUE)
-fit3_box<- ets(serie_box,model = "MAA")
+fit3_box<- ets(serie_box,model = "MAA",damped = FALSE)
 fit4_box<- ets(serie_box,model = "MAA",damped = TRUE)
-# fit5_box<- ets(serie_box,model = "AMA")
+# fit5_box<- ets(serie_box,model = "AMA",damped = FALSE)
 # fit6_box<- ets(serie_box,model = "AMA",damped = TRUE)
-# fit7_box<- ets(serie_box,model = "AAM")
+# fit7_box<- ets(serie_box,model = "AAM",damped = FALSE)
 # fit8_box<- ets(serie_box,model = "AAM",damped = TRUE)
-# fit9_box<- ets(serie_box,model = "MMA")
+# fit9_box<- ets(serie_box,model = "MMA",damped = FALSE)
 # fit10_box<- ets(serie_box,model = "MMA",damped = TRUE)
-fit11_box<- ets(serie_box,model = "MAM")
+fit11_box<- ets(serie_box,model = "MAM",damped = FALSE)
 fit12_box<- ets(serie_box,model = "MAM",damped = TRUE)
-# fit13_box<- ets(serie_box,model = "AMM")
+# fit13_box<- ets(serie_box,model = "AMM",damped = FALSE)
 # fit14_box<- ets(serie_box,model = "AMM",damped = TRUE)
-fit15_box<- ets(serie_box,model = "MMM")
+fit15_box<- ets(serie_box,model = "MMM",damped = FALSE)
 fit16_box<- ets(serie_box,model = "MMM", damped = TRUE)
 
 AIC <- rbind(fit1_box$aic,fit2_box$aic,fit3_box$aic,fit4_box$aic,
@@ -253,12 +254,12 @@ f_arima_boxcox <- function(y, h){
 }
 # ETS
 f_ets <- function(y, h){
-  fit = ets(y, model="MAM")
-  forecast(fit, h, bootstrap = T)
+  fit = ets(y, model = "MMM", damped = TRUE)
+  forecast(fit, h)
 }
 # ETS com transformação
 f_ets_boxcox <- function(y, h){
-  fit = ets(y, model="AAA", lambda = 0.3165242)
+  fit = ets(y, model="AAA", damped = FALSE, lambda = 0.3165242)
   forecast(fit, h)
 }
 
@@ -285,7 +286,7 @@ xtable(tab)
 # Gráfico das médias dos resultados dos erros
 # Sem transformação <- as.numeric(tab)
 plot.ts(tab,plot.type='s',col=c("#06d6a0","#1b9aaa","#ef476f","#ffc43d"),lwd=2,xlab="h",ylab="MAE",
-        main=bquote('Gráfico dos horizontes e seus erros de previsão'))
+        main=bquote('Gráfico dos erros de previsão para cada horizonte'))
 legend('topleft', legend=c('ARIMA', 'ETS','ARIMA com Box-Cox', 'ETS com Box-Cox'), 
        col=c("#06d6a0","#1b9aaa","#ef476f","#ffc43d"), lwd=2)
 
